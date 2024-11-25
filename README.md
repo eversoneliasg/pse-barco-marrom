@@ -22,4 +22,4 @@ Como primeira porção do trabalho desenvolvemos funções concernindo o funcion
 
 Clone este repositório:  
    ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
+   https://github.com/eversoneliasg/pse-barco-marrom.git
