@@ -1,7 +1,7 @@
 # Competição de Barcos - Barco Marrom
   
  O projeto aqui exposto é o código desenvolvido pelos integrantes do grupo equivalente ao _Barco Marrom_ para seu funcionamento no trabalho final de _Programação de Sistemas Embarcados_.
-
+ 
 ## Índice
 
 1. [Integrantes](#itegrantes)
