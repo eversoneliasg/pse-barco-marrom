@@ -10,7 +10,7 @@
 
 ### 1. Integrantes:
 
-* Elias Miranda Nacif Rocha (2022054720)
+* Elias Nacif
 * Everson Elias
 * Vincent Pernarh
 
