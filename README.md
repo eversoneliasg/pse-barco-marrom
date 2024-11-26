@@ -31,10 +31,26 @@ A função acima toma em consideração os parâmetros:
 * _timer e channel_, apontam para o sinal de PWM que será utilizado para o funcionamento do servo-motor pelo timer e seu canal de saída específico,
 * _newPosition_, indica qual é a nova posição que o leme deve tomar. Tomando em consideração que o servo motor MG90S tem um range de 180°, as entradas aceitas para o funcionamento da função variam de 44 a 144.
   > 44 : 0° (leme totalmente à direita tomando em consideração a frente do barco)
-  > 
+  >
   > 94 : 90° (leme centralizado e em sua posição neutra)
   > 
   > 144 : 180° (leme totalmente à esquerda tomando em consideração a frente do barco)
+* _speed_, indica a velocidade com que o leme irá variar para sua nova posição. Os valores programados para tal parâmetro variam entre 1 e 10 de forma crescente. Considerando a conexão direta do parâmetro em questão com a parte de controle e direcionamento do barco ao longo da sua trajetória, essa porção do código ainda está sujeita a reajustes e melhoramentos futuros.
+
+Por fim, desenvolveu-se a função de controle do Motor DC como pode ser vista abaixo:
+``` C
+// Função de Controle do Motor
+void Motor_Control(TIM_HandleTypeDef timer, uint32_t channel, bool enable, bool direction, uint16_t speed)
+```
+A função acima, em seguida, toma em consideração os parâmetros:
+* _timer e channel_, apontam para o sinal de PWM que será utilizado para o funcionamento do servo-motor pelo timer e seu canal de saída específico,
+* _newPosition_, indica qual é a nova posição que o leme deve tomar. Tomando em consideração que o servo motor MG90S tem um range de 180°, as entradas aceitas para o funcionamento da função variam de 44 a 144.
+  > 44 : 0° (leme totalmente à direita tomando em consideração a frente do barco)
+  >
+  > 94 : 90° (leme centralizado e em sua posição neutra)
+  > 
+  > 144 : 180° (leme totalmente à esquerda tomando em consideração a frente do barco)
+* _speed_, indica a velocidade com que o leme irá variar para sua nova posição. Os valores programados para tal parâmetro variam entre 1 e 10 de forma crescente. Considerando a conexão direta do parâmetro em questão com a parte de controle e direcionamento do barco ao longo da sua trajetória, essa porção do código ainda está sujeita a reajustes e melhoramentos futuros.
 
 ### 3. Instalação:
 
