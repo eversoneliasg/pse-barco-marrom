@@ -12,7 +12,7 @@
 
 * Elias Miranda Nacif Rocha (2022054720)
 * Everson Elias
-* Vincent
+* Vincent Pernarh
 
 ### 2. Leme e Motor:
 
