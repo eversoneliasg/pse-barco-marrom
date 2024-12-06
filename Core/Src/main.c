@@ -18,10 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "MOTOReLEME.h"
+#include "motor.h"
+#include "rudder.h"
 #include <stdbool.h> // Include for boolean type
 /* USER CODE END Includes */
 
@@ -60,8 +60,6 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void setPWM2(TIM_HandleTypeDef, uint32_t , uint16_t period, uint16_t);
-void Motor_Control(bool enable, bool direction, uint16_t speed);
 
 /* USER CODE END 0 */
 
@@ -109,9 +107,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //HAL_Delay(2000);
-	  AtualizarLeme(htim4, 44,1);
+	  Rudder_Update(htim4, 44,1);
 	  HAL_Delay(2000);
-	  AtualizarLeme(htim4, 144,1);
+	  Rudder_Update(htim4, 144,1);
 
 	  Motor_Control(true, true, 500); // Enable motor, forward direction, 50% speed
 	  HAL_Delay(2000); // Wait for 2 seconds
@@ -358,36 +356,7 @@ static void MX_GPIO_Init(void)
 
 }
 /* USER CODE BEGIN 4 */
-void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t pulse)
-{
-	 HAL_TIM_PWM_Stop(&timer, channel); // stop generation of pwm
-	 TIM_OC_InitTypeDef sConfigOC;
-	 timer.Init.Period = period; // set the period duration
-	 HAL_TIM_PWM_Init(&timer); // reinititialise with new period value
-	 sConfigOC.OCMode = TIM_OCMODE_PWM1;
-	 sConfigOC.Pulse = pulse; // set the pulse duration
-	 sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-	 sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	 HAL_TIM_PWM_ConfigChannel(&timer, &sConfigOC, channel);
-	 HAL_TIM_PWM_Start(&timer, channel); // start pwm generation
-}
 
-
-
-/* Motor control function to manage motor state */
-void Motor_Control(bool enable, bool direction, uint16_t speed) {
-  if (enable) {
-    // Set motor direction
-    HAL_GPIO_WritePin(L293D_C_LK_GPIO_Port, L293D_C_LK_Pin, direction ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    // Set PWM duty cycle for speed control (PA7)
-    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, speed);
-    // Start PWM
-    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-  } else {
-    // Stop motor by disabling PWM
-    HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_2);
-  }
-}
 /* USER CODE END 4 */
 
 /**
