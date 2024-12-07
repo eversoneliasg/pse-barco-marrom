@@ -13,6 +13,6 @@
 #define MOTOR_SPEED_MAX 1000
 
 /* Function prototypes */
-void Motor_Control(bool enable, bool direction, uint16_t speed);
+void Motor_Control(TIM_HandleTypeDef *timer, bool enable, bool direction, uint16_t speed);
 
 #endif // MOTOR_H
