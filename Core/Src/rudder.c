@@ -5,6 +5,7 @@
  *      Author: Elias Nacif, Vincent, Everson Elias
 */
 #include "rudder.h"
+#include "main.h"
 
 uint16_t currentRudderPosition = 94;
 
