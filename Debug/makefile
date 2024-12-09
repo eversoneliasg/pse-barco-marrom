@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := barco_total_function
+BUILD_ARTIFACT_NAME := funcionando
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-barco_total_function.elf \
+funcionando.elf \
 
 MAP_FILES += \
-barco_total_function.map \
+funcionando.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-barco_total_function.list \
+funcionando.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: barco_total_function.elf secondary-outputs
+main-build: funcionando.elf secondary-outputs
 
 # Tool invocations
-barco_total_function.elf barco_total_function.map: $(OBJS) $(USER_OBJS) C:\Users\Vpena\STM32CubeIDE\workspace_1.16.1\barco_total_function\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "barco_total_function.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Vpena\STM32CubeIDE\workspace_1.16.1\barco_total_function\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="barco_total_function.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+funcionando.elf funcionando.map: $(OBJS) $(USER_OBJS) C:\Users\Vpena\Desktop\try2\uart\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "funcionando.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Vpena\Desktop\try2\uart\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="funcionando.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-barco_total_function.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "barco_total_function.list"
+funcionando.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "funcionando.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) barco_total_function.elf barco_total_function.list barco_total_function.map default.size.stdout
+	-$(RM) default.size.stdout funcionando.elf funcionando.list funcionando.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

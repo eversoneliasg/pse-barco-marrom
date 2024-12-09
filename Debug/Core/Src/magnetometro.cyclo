@@ -1,0 +1,7 @@
+../Core/Src/magnetometro.c:90:6:HMC5883L_Init	1
+../Core/Src/magnetometro.c:108:6:HMC5883L_ReadData	2
+../Core/Src/magnetometro.c:123:9:Filter_Data	3
+../Core/Src/magnetometro.c:138:7:Measure_Distance	1
+../Core/Src/magnetometro.c:142:15:Data_Means	2
+../Core/Src/magnetometro.c:161:9:XY_to_Degrees	2
+../Core/Src/magnetometro.c:168:9:RudderDegree	1
