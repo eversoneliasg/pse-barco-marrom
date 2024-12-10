@@ -6,7 +6,8 @@
 
 1. [Integrantes](#itegrantes)
 2. [Leme e Motor](#leme-e-Motor)
-3. [Instalação](#instalação)
+3. [Magnetômetro](#magnetometro)
+4. [Instalação](#instalação)
 
 ### 1. Integrantes:
 
@@ -70,8 +71,118 @@ Para testar a operação de ambas as funções em questão, adicione o código e
   }
   /* USER CODE END 3 */
 ```
+### 3. Magnetômetro HMC5883L
 
-### 3. Instalação:
+O magnetômetro HMC5883L foi integrado ao projeto para medir a direção do barco com base no campo magnético terrestre. A comunicação com o sensor é feita via I2C, e as leituras de dados brutos são processadas para calcular a direção do barco em relação ao Norte magnético.
+
+#### a. Funções do Magnetômetro
+
+O módulo *magnetometro.h* contém as seguintes funções para configuração, leitura e processamento de dados do sensor HMC5883L:
+
+1. **`HMC5883L_Init(I2C_HandleTypeDef *hi2c)`**
+   - **Descrição**: Inicializa e configura o sensor HMC5883L para seu funcionamento desejado. Configura o número de amostras, taxa de dados e o modo de medição.
+   - **Parâmetros**:
+     - `hi2c`: Ponteiro para uma estrutura `I2C_HandleTypeDef`, que contém as informações de configuração do I2C.
+   - **Exemplo de uso**:
+     ```c
+     HMC5883L_Init(&hi2c1);
+     ```
+
+2. **`HMC5883L_ReadData(I2C_HandleTypeDef *hi2c, XYCoordinates reading[8])`**
+   - **Descrição**: Lê os dados brutos do campo magnético nos eixos X e Y. O sensor retorna um array de 8 leituras, com as coordenadas em dois eixos.
+   - **Parâmetros**:
+     - `hi2c`: Ponteiro para a estrutura `I2C_HandleTypeDef`.
+     - `reading`: Array de estruturas `XYCoordinates` para armazenar os dados brutos de cada leitura.
+   - **Exemplo de uso**:
+     ```c
+     XYCoordinates readings[8];
+     HMC5883L_ReadData(&hi2c1, readings);
+     ```
+
+3. **`Filter_Data(XYCoordinates reading[8])`**
+   - **Descrição**: Filtra as leituras do magnetômetro, removendo os dados que se desviam significativamente da média (centróide). Retorna o número de leituras válidas restantes.
+   - **Parâmetros**:
+     - `reading`: Array de leituras do magnetômetro.
+   - **Exemplo de uso**:
+     ```c
+     uint8_t validReadings = Filter_Data(readings);
+     ```
+
+4. **`Measure_Distance(XYCoordinates a, XYCoordinates b)`**
+   - **Descrição**: Calcula a distância euclidiana entre dois pontos no plano 2D (eixos X e Y). Essa função é usada para determinar a proximidade das leituras em relação ao centróide.
+   - **Parâmetros**:
+     - `a`: Primeira coordenada (estrutura `XYCoordinates`).
+     - `b`: Segunda coordenada (estrutura `XYCoordinates`).
+   - **Exemplo de uso**:
+     ```c
+     float distance = Measure_Distance(reading[i], centroid);
+     ```
+
+5. **`Data_Means(XYCoordinates reading[8], uint8_t n)`**
+   - **Descrição**: Calcula a média das coordenadas X e Y de um conjunto de leituras do magnetômetro.
+   - **Parâmetros**:
+     - `reading`: Array de leituras do magnetômetro.
+     - `n`: Número de leituras.
+   - **Exemplo de uso**:
+     ```c
+     XYCoordinates centroid = Data_Means(readings, 8);
+     ```
+
+6. **`XY_to_Degrees(XYCoordinates coordinates)`**
+   - **Descrição**: Converte as coordenadas X e Y para um ângulo em graus, com base no campo magnético e ajustado para o Norte 	magnético. A calibração foi feita com base em uma bússola.
+   - **Parâmetros**:
+     - `coordinates`: Estrutura `XYCoordinates` contendo as coordenadas X e Y.
+   - **Exemplo de uso**:
+     ```c
+     int16_t angle = XY_to_Degrees(centroid);
+     ```
+
+7. **`RudderDegree(uint16_t boatAngle, int16_t arrivalAngle)`**
+   - **Descrição**: Calcula o ângulo do leme necessário para orientar o barco em direção ao ângulo de chegada desejado.
+   - **Parâmetros**:
+     - `boatAngle`: Ângulo atual do barco.
+     - `arrivalAngle`: Ângulo de chegada desejado.
+   - **Exemplo de uso**:
+     ```c
+     int16_t rudderAngle = RudderDegree(boatHeading, targetHeading);
+     ```
+
+#### b. Exemplo de Integração no `main.c`
+
+Após a inclusão do arquivo *magnetometro.h*, o código do `main.c` pode ser atualizado para incluir o uso do magnetômetro:
+
+```c
+// ==== Includes ====
+#include "magnetometro.h"
+#include "main.h"
+// ==================
+
+// Função principal
+int main(void) {
+    HAL_Init();
+    HMC5883L_Init(&hi2c1);
+
+    XYCoordinates readings[8];
+
+    while (1) {
+        // Leitura dos dados do magnetômetro
+        HMC5883L_ReadData(&hi2c1, readings);
+
+        // Filtra os dados
+        uint8_t validReadings = Filter_Data(readings);
+
+        // Calcula o ângulo
+        int16_t heading = XY_to_Degrees(Data_Means(readings, validReadings));
+
+        // Usa a direção para ajustar o leme
+        Rudder_Control(htim4, TIM_CHANNEL_1, heading, 10);
+        
+        HAL_Delay(1000);
+    }
+}
+ ```
+
+### 4. Instalação:
 
 Para a instalação do código aqui presente, clone este repositório:  
    ```bash
