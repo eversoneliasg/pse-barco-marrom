@@ -6,7 +6,7 @@
 
 1. [Integrantes](#itegrantes)
 2. [Leme e Motor](#leme-e-Motor)
-3. [Magnetômetro](#magnetometro)
+3. [Magnetômetro HMC5883L](#magnetômetro-hmc5883l)
 4. [Instalação](#instalação)
 
 ### 1. Integrantes:
@@ -14,7 +14,7 @@
 * Elias Nacif
 * Everson Elias
 * Vincent Pernarh
-
+  
 ### 2. Leme e Motor:
 
 Como primeira porção do trabalho desenvolvemos funções concernindo o funcionamento e uso do leme e motor do barco durante a competição.
