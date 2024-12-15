@@ -21,9 +21,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "data_filter_service.h"
+#include "jdy18_driver.h"
+#include "location_service.h"
 #include <stdio.h>
 #include <string.h>
-
 //static void UART_TransmitMessage(char*);
 //char message[100] = "";
 
@@ -48,11 +50,10 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
-
 UART_HandleTypeDef huart2;
-
 /* USER CODE BEGIN PV */
-
+JDY18_HandleTypeDef bleHandler;
+buffer_t b1Buffer, b2Buffer, b3Buffer;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,18 +70,12 @@ static void MX_I2C1_Init(void);
 /* USER CODE BEGIN 0 */
 #include "magnetometro.h"
 //#include "stm32f4xx_hal_i2c.h"
-
 #include "print_readings.h"
 //#include "HMC5883L.h"
 //#include "I2Cdev.h"
 XYCoordinates reading[8];
-
 XYCoordinates PosBeaconChegada = {35,-74};
-
-
-
 int16_t arrivalAngle;
-
 /* USER CODE END 0 */
 
 /**
@@ -117,6 +112,25 @@ int main(void)
   MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
+  /* Initialize the Bluetooth driver */
+  JDY18_HandleTypeDef bleHandler = {
+      .huart = &huart2,
+      .name = MASTER_BLE_NAME,
+      .baudRate = BAUD_9600,
+      .role = MASTER,
+      .parity = NO_PARITY,
+      .stopBit = 1
+  };
+  JDY18Driver_Init(&bleHandler);
+
+  /* Initialize the data filters */
+  DataFilterService_InitBuffer(&b1Buffer);
+  DataFilterService_InitBuffer(&b2Buffer);
+  DataFilterService_InitBuffer(&b3Buffer);
+
+  /* Initialize location service */
+  LocationService_Init(&huart2, NULL);
+
   HMC5883L_Init(&hi2c1);
   uint8_t resultsize;
   XYCoordinates  final_coordinates ;
@@ -130,49 +144,45 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	 sprintf(message, "Hello, UART World!\r\n");
-//	 	      UART_TransmitMessage(message);
-//	 	      HAL_Delay(1000);
+    /* Update location */
+    LocationService_UpdateLocation();
 
-//	  snprintf(message, sizeof(message), "Reading %d \r\n",  hi2c1);
-//	  UART_TransmitMessage(message,huart2);
-	  //HMC5883L_testConnection();
+    /* Retrieve location and angle */
+    location_t location = LocationService_GetLocation();
+    float arrivalAngle = LocationService_GetArrivalAngle();
+    uint8_t isInDestiny = LocationService_IsInDestiny();
 
-  /* USER CODE BEGIN 3 */
- 	  HMC5883L_ReadData(&hi2c1, reading);
+    /* Send results via UART */
+    char message[100];
+    snprintf(message, sizeof(message), 
+        "Location: Lat=%.2f, Long=%.2f, Angle=%.2f, InDestiny=%d\r\n",
+        location.latitude, location.longitude, arrivalAngle, isInDestiny);
+    HAL_UART_Transmit(&huart2, (uint8_t *)message, strlen(message), HAL_MAX_DELAY);
 
- 	 resultsize = Filter_Data(reading);
- 	 final_coordinates   = Data_Means(reading, resultsize);
+    HAL_Delay(1000);
+    /* PART 3 CODE 
+    HMC5883L_ReadData(&hi2c1, reading);
 
- 	 Angle = XY_to_Degrees(final_coordinates);
+    resultsize = Filter_Data(reading);
+    final_coordinates   = Data_Means(reading, resultsize);
 
- 	 arrivalAngle = XY_to_Degrees(PosBeaconChegada);
+    Angle = XY_to_Degrees(final_coordinates);
 
+    arrivalAngle = XY_to_Degrees(PosBeaconChegada);
 
+    snprintf(message, sizeof(message),"Final Coordinates : x =  %d   y =  %d  :  angle  = %d  heading pos  = %d\r\n" ,
+        final_coordinates.x,final_coordinates.y,Angle, RudderDegree(Angle,arrivalAngle));
 
-		snprintf(message, sizeof(message),"Final Coordinates : x =  %d   y =  %d  :  angle  = %d  heading pos  = %d\r\n" ,
-				final_coordinates.x,final_coordinates.y,Angle, RudderDegree(Angle,arrivalAngle));
+    UART_TransmitMessage(message,huart2);
 
-		UART_TransmitMessage(message,huart2);
-
-
- 	 //
  	  HAL_Delay(10);
- 	      // Process and send each reading
-// 	      for (int i = 0; i < 8; i++) {
-// 	        snprintf(message, sizeof(message),
-// 	                 "Reading %d: X=%d, Y=%d\r\n",
-// 	                 i + 1, reading[i].x, reading[i].y);
-// 	        UART_TransmitMessage(message,huart2);
-// 	      }
-// 	      HAL_Delay(10);
-
- 	      // Check for UART input
- 	      if (HAL_UART_Receive(&huart2, caractere, 1, 1000) == HAL_OK) {
- 	        snprintf(message, sizeof(message),
- 	                 "Received Character: %c\r\n", caractere[0]);
- 	        UART_TransmitMessage(message,huart2);
- 	      }
+ 	  // Check for UART input
+    if (HAL_UART_Receive(&huart2, caractere, 1, 1000) == HAL_OK) {
+      snprintf(message, sizeof(message),
+                "Received Character: %c\r\n", caractere[0]);
+      UART_TransmitMessage(message,huart2);
+    }
+    */
   }
   /* USER CODE END 3 */
 }
@@ -363,12 +373,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-///* USER CODE BEGIN 4 */
-//void UART_TransmitMessage(char *message){
-//	HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 1000);
-//
-//}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE)) {
+    __HAL_UART_CLEAR_IDLEFLAG(huart);
+    JDY18Driver_ParseScanResponse((char *)uartBuffer, &gScan);
+  }
+}
 /* USER CODE END 4 */
 
 /**
