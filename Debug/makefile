@@ -60,8 +60,8 @@ all: main-build
 main-build: funcionando.elf secondary-outputs
 
 # Tool invocations
-funcionando.elf funcionando.map: $(OBJS) $(USER_OBJS) C:\Users\Vpena\Desktop\try2\uart\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "funcionando.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Vpena\Desktop\try2\uart\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="funcionando.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+funcionando.elf funcionando.map: $(OBJS) $(USER_OBJS) C:\Users\Vpena\Desktop\Learning\ Materials\Sistemas\ embarcados\pse-barco-marrom-trabalho-4\pse-barco-marrom-trabalho-4\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "funcionando.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Vpena\Desktop\Learning Materials\Sistemas embarcados\pse-barco-marrom-trabalho-4\pse-barco-marrom-trabalho-4\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="funcionando.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -22,8 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "data_filter_service.h"
-#include "jdy18_driver.h"
-#include "location_service.h"
+#include "BLE.h"
+//#include "location_service.h"
 #include <stdio.h>
 #include <string.h>
 //static void UART_TransmitMessage(char*);
@@ -50,9 +50,11 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
+
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
+
 /* USER CODE BEGIN PV */
-JDY18_HandleTypeDef bleHandler;
 buffer_t b1Buffer, b2Buffer, b3Buffer;
 /* USER CODE END PV */
 
@@ -62,6 +64,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -110,31 +113,37 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C2_Init();
   MX_I2C1_Init();
-
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   /* Initialize the Bluetooth driver */
-  JDY18_HandleTypeDef bleHandler = {
-      .huart = &huart2,
-      .name = MASTER_BLE_NAME,
+  BLE_HandleTypeDef bleHandler = {
+      .huart = &huart3,
+      .name = "MASTER_SCAN_SLAVE",
       .baudRate = BAUD_9600,
       .role = MASTER,
       .parity = NO_PARITY,
       .stopBit = 1
   };
-  JDY18Driver_Init(&bleHandler);
+
+  ble_Init(&bleHandler);
+
 
   /* Initialize the data filters */
-  DataFilterService_InitBuffer(&b1Buffer);
-  DataFilterService_InitBuffer(&b2Buffer);
-  DataFilterService_InitBuffer(&b3Buffer);
+  //BLE_HandleTypeDef bleHandler;
+  //DataFilterService_InitBuffer(&b1Buffer);
+ // DataFilterService_InitBuffer(&b2Buffer);
+  //DataFilterService_InitBuffer(&b3Buffer);
 
   /* Initialize location service */
-  LocationService_Init(&huart2, NULL);
+  //LocationService_Init(&huart2, NULL);
 
   HMC5883L_Init(&hi2c1);
   uint8_t resultsize;
   XYCoordinates  final_coordinates ;
   int16_t Angle;
+  scan_t* gScan;
+
+  //ble_ConnectToDevice("Vpena", &huart3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -144,24 +153,48 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
     /* Update location */
-    LocationService_UpdateLocation();
+    //LocationService_UpdateLocation();
 
     /* Retrieve location and angle */
-    location_t location = LocationService_GetLocation();
-    float arrivalAngle = LocationService_GetArrivalAngle();
-    uint8_t isInDestiny = LocationService_IsInDestiny();
+    //location_t location = LocationService_GetLocation();
+    //float arrivalAngle = LocationService_GetArrivalAngle();
+    //uint8_t isInDestiny = LocationService_IsInDestiny();
 
     /* Send results via UART */
-    char message[100];
-    snprintf(message, sizeof(message), 
-        "Location: Lat=%.2f, Long=%.2f, Angle=%.2f, InDestiny=%d\r\n",
-        location.latitude, location.longitude, arrivalAngle, isInDestiny);
-    HAL_UART_Transmit(&huart2, (uint8_t *)message, strlen(message), HAL_MAX_DELAY);
+//    char message[100];
+//    snprintf(message, sizeof(message),
+//        "Location: Lat=%.2f, Long=%.2f, Angle=%.2f, InDestiny=%d\r\n",
+//        location.latitude, location.longitude, arrivalAngle, isInDestiny);
+//    HAL_UART_Transmit(&huart2, (uint8_t *)message, strlen(message), HAL_MAX_DELAY);
+//
+//
 
-    HAL_Delay(1000);
-    /* PART 3 CODE 
-    HMC5883L_ReadData(&hi2c1, reading);
+	  ble_InquireDevices(&huart3);
+	  HAL_Delay(3000);
+
+
+	  snprintf(message, sizeof(message), "==================== Scan Devices =========== \r\n");
+	  UART_TransmitMessage(message,huart2);
+	  HAL_Delay(500);
+
+	  //scann(huart2);
+
+	  if(gScan->size > 0) {
+	      DisplayScannedDevices(gScan,huart2);
+	  } else {
+	      snprintf(message, sizeof(message), "No devices found.\r\n");
+	      UART_TransmitMessage(message, huart2);
+	  }
+
+	 // DisplayScannedDevices(scan,huart2);
+
+
+
+
+    // PART 3 CODE
+   HMC5883L_ReadData(&hi2c1, reading);
 
     resultsize = Filter_Data(reading);
     final_coordinates   = Data_Means(reading, resultsize);
@@ -182,7 +215,7 @@ int main(void)
                 "Received Character: %c\r\n", caractere[0]);
       UART_TransmitMessage(message,huart2);
     }
-    */
+
   }
   /* USER CODE END 3 */
 }
@@ -336,6 +369,39 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 9600;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -373,12 +439,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE)) {
-    __HAL_UART_CLEAR_IDLEFLAG(huart);
-    JDY18Driver_ParseScanResponse((char *)uartBuffer, &gScan);
-  }
-}
+
 /* USER CODE END 4 */
 
 /**

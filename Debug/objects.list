@@ -1,5 +1,7 @@
+"./Core/Src/BLE.o"
 "./Core/Src/HMC5883L.o"
 "./Core/Src/I2Cdev.o"
+"./Core/Src/data_filter_service.o"
 "./Core/Src/magnetometro.o"
 "./Core/Src/main.o"
 "./Core/Src/print_readings.o"

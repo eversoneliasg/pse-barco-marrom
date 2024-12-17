@@ -1,0 +1,13 @@
+../Core/Src/BLE.c:30:6:ble_Init	1
+../Core/Src/BLE.c:46:6:ble_SendData	1
+../Core/Src/BLE.c:54:6:ble_SetName	1
+../Core/Src/BLE.c:63:6:ble_SetBaudRate	1
+../Core/Src/BLE.c:72:6:ble_SetRole	1
+../Core/Src/BLE.c:81:6:ble_SetParity	1
+../Core/Src/BLE.c:90:6:ble_SetStopBit	1
+../Core/Src/BLE.c:99:6:ble_InquireDevices	1
+../Core/Src/BLE.c:109:6:ble_GetScannedDevices	1
+../Core/Src/BLE.c:114:6:ble_LoadDeviceInfo	1
+../Core/Src/BLE.c:135:6:ble_ParseScanResponse	4
+../Core/Src/BLE.c:173:6:HAL_UART_RxCpltCallback	3
+../Core/Src/BLE.c:194:6:DisplayScannedDevices	2

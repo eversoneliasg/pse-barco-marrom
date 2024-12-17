@@ -9,7 +9,7 @@
  * 
  */
 
-#include "Services/data_filter_service.h"
+#include "data_filter_service.h"
 
 void DataFilterService_InitBuffer(buffer_t* buffer)
 {
