@@ -186,11 +186,17 @@ int main(void) {
 ### 4. BLE : Conexão Bluetooth via BLE:
 O Bluetooth Low Energy (BLE) é uma tecnologia de comunicação sem fio projetada para dispositivos que precisam transferir dados com baixo consumo de energia. Nesse caso, a tecnologia BLE foi utilizada para localizar a posição de um barco ao longo do lago.  
 
-Três posições no lago foram demarcadas com o uso de **beacons**, que se comunicam com o barco por meio do BLE. Cada *beacon* fornece dados sobre a distância entre ele e o barco, permitindo ao sistema calcular a posição exata do barco com base nessas informações.  
+Três posições no lago foram demarcadas com o uso de _beacons_, que se comunicam com o barco por meio do BLE. Cada *beacon* fornece dados sobre a distância entre ele e o barco, permitindo ao sistema calcular a posição exata do barco com base nessas informações.  
 
 A imagem abaixo ilustra essa configuração, onde as distâncias entre o barco e os três *beacons* (d1, d2 e d3) são utilizadas para determinar a posição do barco por meio de técnicas de _trilateração_.
 
-<img src="/img/arquivo.gif">
+<p align="center">
+ <img src="https://github.com/user-attachments/assets/49ae8ef2-ccbb-4840-ad3c-3aba137bdd62" alt="Imagem do barco">
+</p>
+<p align="center"><em>Figura 1: Localização do barco utilizando BLE e trilateração.</em></p>
+
+Portanto, para iniciar nossa porção do trabalho e garantir o funcionamento desejado do BLE e o barco, utilizamos o código base disponibilizado e desenvolvido pelo professor 
+Ricardo de Oliveira Duarte, docente da UFMG pelo _DELT_. Ao usá-lo como base, modificando-o, alcançamos uma versão funcional e ideal para a nossa aplicação do barco marrom. Consequentemente, por questão de sintetização e de garantir melhor documentação e clareza, optou-se por não descrever o código na íntegra, mas apenas as modificações realizadas. Dessa forma, reconhecer-se-á devidamente a contribuição do professor Ricardo de Oliveira Duarte na concepção inicial do programa, também apresentando as principais mudanças feitas pelos participantes do grupo em questão.
 
 ### 5. Instalação:
 
