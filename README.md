@@ -7,7 +7,8 @@
 1. [Integrantes](#itegrantes)
 2. [Leme e Motor](#leme-e-Motor)
 3. [Magnetômetro HMC5883L](#magnetômetro-hmc5883l)
-4. [Instalação](#instalação)
+4. [BLE](#conexao-bluetooth-via-ble)
+5. [Instalação](#instalação)
 
 ### 1. Integrantes:
 
@@ -182,7 +183,16 @@ int main(void) {
 }
  ```
 
-### 4. Instalação:
+### 4. BLE : Conexão Bluetooth via BLE:
+O Bluetooth Low Energy (BLE) é uma tecnologia de comunicação sem fio projetada para dispositivos que precisam transferir dados com baixo consumo de energia. Nesse caso, a tecnologia BLE foi utilizada para localizar a posição de um barco ao longo do lago.  
+
+Três posições no lago foram demarcadas com o uso de **beacons**, que se comunicam com o barco por meio do BLE. Cada *beacon* fornece dados sobre a distância entre ele e o barco, permitindo ao sistema calcular a posição exata do barco com base nessas informações.  
+
+A imagem abaixo ilustra essa configuração, onde as distâncias entre o barco e os três *beacons* (d1, d2 e d3) são utilizadas para determinar a posição do barco por meio de técnicas de _trilateração_.
+
+<img src="/img/arquivo.gif">
+
+### 5. Instalação:
 
 Para a instalação do código aqui presente, clone este repositório:  
    ```bash
