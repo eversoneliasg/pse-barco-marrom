@@ -183,20 +183,97 @@ int main(void) {
 }
  ```
 
-### 4. BLE : Conexão Bluetooth via BLE:
-O Bluetooth Low Energy (BLE) é uma tecnologia de comunicação sem fio projetada para dispositivos que precisam transferir dados com baixo consumo de energia. Nesse caso, a tecnologia BLE foi utilizada para localizar a posição de um barco ao longo do lago.  
+### 4. BLE: Conexão Bluetooth via BLE
 
-Três posições no lago foram demarcadas com o uso de _beacons_, que se comunicam com o barco por meio do BLE. Cada *beacon* fornece dados sobre a distância entre ele e o barco, permitindo ao sistema calcular a posição exata do barco com base nessas informações.  
+O **Bluetooth Low Energy (BLE)** é uma tecnologia de comunicação sem fio projetada para dispositivos que precisam transferir dados com baixo consumo de energia. Este projeto utiliza BLE para localizar a posição de um barco ao longo de um lago.
 
-A imagem abaixo ilustra essa configuração, onde as distâncias entre o barco e os três *beacons* (d1, d2 e d3) são utilizadas para determinar a posição do barco por meio de técnicas de _trilateração_.
+#### a. Configuração
+
+Três posições no lago foram demarcadas com o uso de _beacons_, que se comunicam com o barco por meio do BLE. Cada _beacon_ fornece dados sobre a distância entre ele e o barco, permitindo ao sistema calcular a posição exata do barco com base em técnicas de **trilateração**.
+
+Abaixo está uma ilustração da configuração, onde as distâncias entre o barco e os três _beacons_ (d1, d2 e d3) são utilizadas para determinar sua posição:
 
 <p align="center">
  <img src="https://github.com/user-attachments/assets/49ae8ef2-ccbb-4840-ad3c-3aba137bdd62" alt="Imagem do barco">
 </p>
 <p align="center"><em>Figura 1: Localização do barco utilizando BLE e trilateração.</em></p>
 
-Portanto, para iniciar nossa porção do trabalho e garantir o funcionamento desejado do BLE e o barco, utilizamos o código base disponibilizado e desenvolvido pelo professor 
-Ricardo de Oliveira Duarte, docente da UFMG pelo _DELT_. Ao usá-lo como base, modificando-o, alcançamos uma versão funcional e ideal para a nossa aplicação do barco marrom. Consequentemente, por questão de sintetização e de garantir melhor documentação e clareza, optou-se por não descrever o código na íntegra, mas apenas as modificações realizadas. Dessa forma, reconhecer-se-á devidamente a contribuição do professor Ricardo de Oliveira Duarte na concepção inicial do programa, também apresentando as principais mudanças feitas pelos participantes do grupo em questão.
+#### b. Estrutura do Código
+
+##### >> Inicialização e Comunicação BLE
+
+O módulo BLE é configurado para comunicação com o barco:
+- Configuração do nome, papel e código de acesso do módulo BLE.
+- Recepção contínua de dados via UART.
+
+##### >> Recepção e Processamento de Dados
+
+- Os dados recebidos são armazenados em um buffer e interpretados para obter os valores RSSI (Indicador de Intensidade de Sinal Recebido).
+- Cada _beacon_ transmite seu RSSI, permitindo calcular a distância do barco até ele.
+
+##### >> Filtragem e Conversão RSSI-Distância
+
+- Aplicação de uma lógica de filtragem (janela deslizante) para suavizar os valores de RSSI e eliminar ruídos.
+- Utilização de uma fórmula logarítmica para converter RSSI em distância aproximada.
+
+#### c. Detalhes do Código
+
+##### >> Funções Principais
+
+- `BLE_Init`: Configura o BLE e inicializa a comunicação UART.
+- `BLE_Scan`: Realiza a varredura de dispositivos BLE e processa os dados recebidos.
+- `Parse_Scanned_Data`: Interpreta os dados dos dispositivos BLE detectados.
+- `Rssi_to_Distance`: Converte RSSI em distância utilizando um modelo logarítmico.
+
+##### >> Filtragem de RSSI
+
+Os valores de RSSI recebidos são suavizados para reduzir a interferência. A filtragem usa uma média móvel com limite de variação para rejeitar valores inconsistentes.
+
+##### >> Cálculo de Distância
+
+A conversão de RSSI para distância utiliza a seguinte fórmula logarítmica:
+
+<p align="center">
+$[
+d = 10^{\frac{(P_{\text{tx}} - \text{RSSI})}{10 \times n}}
+]$
+</p>
+
+
+Onde:
+- **d**: distância em metros.
+- **P<sub>tx</sub>**: potência do sinal a 1 metro do _beacon_.
+- **RSSI**: valor de intensidade do sinal recebido.
+- **n**: expoente de perda de propagação.
+
+#### e. Exemplo de Integração no `main.c`
+
+Após a inclusão do arquivo *ble.h*, o código do `main.c` pode ser atualizado para incluir o uso do ble:
+
+```c
+// ==== Includes ====
+#include "ble.h"
+#include "main.h"
+// ==================
+
+// Função principal
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+    MX_USART2_UART_Init();
+    MX_USART3_UART_Init();
+
+    BLE_Init(&huart3,&huart2);
+
+
+    while (1) {
+    	BLE_Scan(&huart3);
+    	Print_Scanned_Data();
+    	Terminal_Send_Text("\n\r");
+    }
+}
+ ```
 
 ### 5. Instalação:
 
